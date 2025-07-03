@@ -112,7 +112,7 @@ public class BudgetsController : ControllerBase
                 Amount = result.Amount,
                 Date = result.Date,
                 CategoryId = result.CategoryId,
-                CategoryName = result.Category.Name
+                CategoryName = result.Category!.Name
             };
 
             return Ok(expenseDto);
@@ -148,6 +148,37 @@ public class BudgetsController : ControllerBase
         }
 
         _context.MonthlyBudgets.Remove(budget);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    // PUT: api/budgets/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateBudget(Guid id, [FromBody] CreateBudgetDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+        
+        var budget = await _context.MonthlyBudgets
+            .Where(b => b.Id == id && b.UserId == userId)
+            .FirstOrDefaultAsync();
+
+        if (budget == null)
+        {
+            return NotFound("Presupuesto no encontrado");
+        }
+
+        // Verificar si ya existe un presupuesto para el mismo mes
+        var existingBudget = await _context.MonthlyBudgets
+            .Where(b => b.Month == dto.Month && b.UserId == userId && b.Id != id)
+            .FirstOrDefaultAsync();
+
+        if (existingBudget != null)
+        {
+            return BadRequest("Ya existe un presupuesto para este mes");
+        }
+
+        budget.Month = dto.Month;
         await _context.SaveChangesAsync();
 
         return NoContent();

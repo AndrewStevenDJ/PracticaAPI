@@ -78,7 +78,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured")))
         };
     });
 
@@ -108,5 +108,15 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-// Línea para que Railway escuche el puerto asignado dinámicamente
-app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT")}");
+// Configurar URL según el entorno
+if (app.Environment.IsDevelopment())
+{
+    // En desarrollo, usar localhost con puerto específico
+    app.Run("http://localhost:7001");
+}
+else
+{
+    // En producción (Railway), usar el puerto asignado dinámicamente
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+    app.Run($"http://0.0.0.0:{port}");
+}

@@ -36,6 +36,31 @@ public class CategoriesController : ControllerBase
         return Ok(new { total, page, pageSize, categories });
     }
 
+    // GET: api/Categories/{id}
+    [HttpGet("{id}")]
+    public async Task<ActionResult<BudgetCategoryDto>> GetCategory(Guid id)
+    {
+        var category = await _context.BudgetCategories
+            .Include(c => c.Expenses)
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (category == null)
+        {
+            return NotFound("Categoría no encontrada");
+        }
+
+        var categoryDto = new BudgetCategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Limit = category.Limit,
+            MonthlyBudgetId = category.MonthlyBudgetId,
+            TotalSpent = category.Expenses.Sum(e => e.Amount)
+        };
+
+        return Ok(categoryDto);
+    }
+
     // POST: api/Categories
     [HttpPost]
     public async Task<IActionResult> CreateCategory([FromBody] BudgetCategoryDto dto)
