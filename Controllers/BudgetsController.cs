@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using PracticaAPI.DTOs;
-using PracticaAPI.Core.Services.Interfaces;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
-namespace PracticaAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class BudgetsController : ControllerBase
 {
     private readonly IBudgetService _service;
