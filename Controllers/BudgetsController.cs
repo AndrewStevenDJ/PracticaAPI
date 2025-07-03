@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
-<<<<<<< HEAD
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PracticaAPI.Core.Entities;
 using PracticaAPI.Data;
-=======
->>>>>>> 9a6f8f748adf9a43da6b541ada7f2230be43748b
 using PracticaAPI.DTOs;
 using PracticaAPI.Core.Services.Interfaces;
 

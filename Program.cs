@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -7,11 +6,6 @@ using System.Text;
 using PracticaAPI.Core.Services;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
-=======
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
->>>>>>> 9a6f8f748adf9a43da6b541ada7f2230be43748b
 
 var builder = WebApplication.CreateBuilder(args);
 
