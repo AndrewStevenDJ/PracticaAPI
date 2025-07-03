@@ -89,7 +89,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+
 
 // app.UseIpFilter(); // Eliminado para permitir acceso desde cualquier IP
 
