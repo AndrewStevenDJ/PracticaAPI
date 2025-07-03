@@ -24,25 +24,25 @@ public class IpFilterMiddleware
         
         _logger.LogInformation($"IP Filter - Path: {path}, Client IP: {clientIp}, Allowed IP: {_allowedIp}");
         
-        // Permitir acceso a Swagger y endpoints de autenticación
-        if (path != null && (path.StartsWith("/swagger") || path.StartsWith("/api/auth") || path.StartsWith("/api/test")))
+        // Permitir acceso solo a endpoints de autenticación y test
+        if (path != null && (path.StartsWith("/api/auth") || path.StartsWith("/api/test")))
         {
             await _next(context);
             return;
         }
 
         // Verificar si la IP del cliente está permitida
-        if (clientIp != _allowedIp)
+        if (clientIp != "187.155.101.200")
         {
-            _logger.LogWarning($"IP Filter - BLOCKED: Client IP '{clientIp}' is not authorized. Allowed: '{_allowedIp}'");
-            context.Response.StatusCode = 403; // Forbidden
+            _logger.LogWarning($"IP Filter - BLOQUEADO: La IP del cliente '{clientIp}' no está autorizada. Permitida: '187.155.101.200'");
+            context.Response.StatusCode = 403; // Prohibido
             context.Response.ContentType = "application/json";
             var errorResponse = new
             {
-                Error = "Access Denied",
-                Message = "Your IP address is not authorized to access this API.",
+                Error = "Acceso denegado",
+                Message = "Su dirección IP no es válida para acceder a esta API.",
                 ClientIP = clientIp,
-                AllowedIP = _allowedIp,
+                AllowedIP = "187.155.101.200",
                 Path = path,
                 Timestamp = DateTime.UtcNow
             };
