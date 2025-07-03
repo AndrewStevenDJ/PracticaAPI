@@ -1,35 +1,37 @@
-using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace PracticaAPI.Middleware;
 
 public class IpFilterMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<IpFilterMiddleware> _logger;
     private readonly string _allowedIp = "187.155.101.200";
 
-    public IpFilterMiddleware(RequestDelegate next, ILogger<IpFilterMiddleware> logger)
+    public IpFilterMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
         var clientIp = GetClientIpAddress(context);
         
-        _logger.LogInformation($"Request from IP: {clientIp}");
+        // Permitir acceso a Swagger y endpoints de autenticación
+        var path = context.Request.Path.Value?.ToLower();
+        if (path != null && (path.StartsWith("/swagger") || path.StartsWith("/api/auth")))
+        {
+            await _next(context);
+            return;
+        }
 
-        // Verificar si la IP está permitida
+        // Verificar si la IP del cliente está permitida
         if (clientIp != _allowedIp)
         {
-            _logger.LogWarning($"Access denied for IP: {clientIp}");
-            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            context.Response.StatusCode = 403; // Forbidden
             await context.Response.WriteAsync("Access denied. Your IP is not authorized.");
             return;
         }
 
-        _logger.LogInformation($"Access granted for IP: {clientIp}");
         await _next(context);
     }
 
@@ -39,7 +41,6 @@ public class IpFilterMiddleware
         var forwardedHeader = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
         if (!string.IsNullOrEmpty(forwardedHeader))
         {
-            // X-Forwarded-For puede contener múltiples IPs, tomar la primera
             return forwardedHeader.Split(',')[0].Trim();
         }
 
@@ -49,16 +50,6 @@ public class IpFilterMiddleware
             return realIpHeader;
         }
 
-        // Si no hay headers de proxy, usar la IP de conexión
         return context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-    }
-}
-
-// Clase de extensión para facilitar el registro del middleware
-public static class IpFilterMiddlewareExtensions
-{
-    public static IApplicationBuilder UseIpFilter(this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<IpFilterMiddleware>();
     }
 } 

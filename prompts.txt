@@ -120,11 +120,11 @@ git log --oneline
 
 ## 🔧 CONFIGURACIÓN
 
-### Filtro de IP
-- **IP Permitida**: 187.155.101.200
-- **Middleware**: IpFilterMiddleware
-- **Comportamiento**: Solo permite acceso desde la IP especificada
-- **Respuesta para IPs no autorizadas**: HTTP 403 Forbidden
+### Seguridad
+- **Autenticación**: JWT Bearer Token
+- **Autorización**: Requerida para todos los endpoints CRUD
+- **CORS**: Configurado para permitir peticiones cross-origin
+- **Filtro de IP**: Solo permite acceso desde 187.155.101.200
 
 ### Base de Datos
 - **Tipo**: InMemory Database (para desarrollo)
@@ -135,8 +135,8 @@ git log --oneline
 - **URL alternativa**: http://localhost:5000/swagger
 
 ### Endpoints de Prueba
+- **GET** `/api/test/status` - Estado de la API con información de IP
 - **GET** `/api/test/ip` - Verificar IP del cliente
-- **GET** `/api/test/status` - Estado de la API
 - **GET** `/api/test/auth-test` - Probar autenticación (requiere token)
 
 ### 🔐 Autenticación JWT

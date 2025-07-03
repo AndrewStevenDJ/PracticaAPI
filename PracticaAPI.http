@@ -4,8 +4,16 @@ GET {{PracticaAPI_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ### Variables de entorno
-@baseUrl = https://localhost:7001
+@baseUrl = http://localhost:7001
 @token = {{login.response.body.token}}
+
+### 0. Probar endpoints de IP (sin autenticación)
+# @name testIp
+GET {{baseUrl}}/api/test/ip
+
+### 0.1. Verificar estado de la API
+# @name testStatus
+GET {{baseUrl}}/api/test/status
 
 ### 1. Registro de usuario
 # @name register
@@ -183,5 +191,10 @@ Authorization: Bearer {{token}}
 ### 23. Probar validaciones - Eliminar presupuesto con gastos
 DELETE {{baseUrl}}/api/budgets/{{createBudget.response.body.id}}
 Authorization: Bearer {{token}}
+
+### 24. Nota importante sobre filtro de IP
+# ⚠️ IMPORTANTE: Esta API solo permite acceso desde la IP 187.155.101.200
+# Si estás probando desde otra IP, recibirás error 403 Forbidden
+# Los endpoints /api/auth/* y /api/test/* están exentos del filtro de IP
 
 ###

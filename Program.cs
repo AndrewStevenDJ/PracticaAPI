@@ -8,6 +8,7 @@ using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using PracticaAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,9 @@ app.UseSwaggerUI();
 // app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+// Agregar middleware de filtro de IP
+app.UseMiddleware<IpFilterMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

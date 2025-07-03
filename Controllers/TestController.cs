@@ -8,6 +8,21 @@ namespace PracticaAPI.Controllers;
 [AllowAnonymous] // Permitir acceso sin autenticación para pruebas
 public class TestController : ControllerBase
 {
+    [HttpGet("status")]
+    public IActionResult GetStatus()
+    {
+        var clientIp = GetClientIpAddress();
+        
+        return Ok(new
+        {
+            Status = "API is running",
+            ClientIP = clientIp,
+            IsAllowed = clientIp == "187.155.101.200",
+            AllowedIP = "187.155.101.200",
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
     [HttpGet("ip")]
     public IActionResult GetClientIp()
     {
@@ -20,17 +35,6 @@ public class TestController : ControllerBase
             Message = clientIp == "187.155.101.200" 
                 ? "Your IP is authorized" 
                 : "Your IP is not authorized"
-        });
-    }
-
-    [HttpGet("status")]
-    public IActionResult GetStatus()
-    {
-        return Ok(new
-        {
-            Status = "API is running",
-            AllowedIP = "187.155.101.200",
-            Timestamp = DateTime.UtcNow
         });
     }
 
