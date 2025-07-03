@@ -15,4 +15,9 @@ RUN dotnet publish -c Release -o /app/publish
 # Etapa 2: runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --fro
+
+# Copiar los archivos publicados desde la etapa de build
+COPY --from=build /app/publish .
+
+# Ejecutar la aplicación
+ENTRYPOINT ["dotnet", "PracticaAPI.dll"]
