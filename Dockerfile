@@ -1,25 +1,18 @@
 # Etapa 1: build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-# Copia la carpeta del proyecto completa
-COPY PracticaAPI/ ./PracticaAPI/
+# 1. Copiar solo el archivo csproj primero (para optimizar caché)
+COPY ["PracticaAPI.csproj", "."]
+RUN dotnet restore "PracticaAPI.csproj"
 
-# Cambiar al directorio del proyecto
-WORKDIR /app/PracticaAPI
-
-# Restaurar paquetes NuGet
-RUN dotnet restore
+# 2. Copiar el resto de los archivos
+COPY . .
 
 # Publicar en modo Release
-RUN dotnet publish -c Release -o /app/out
+RUN dotnet publish -c Release -o /app/publish
 
 # Etapa 2: runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-
-# Copiar los archivos publicados
-COPY --from=build /app/out .
-
-# Ejecutar la aplicación
-ENTRYPOINT ["dotnet", "PracticaAPI.dll"]
+COPY --fro
