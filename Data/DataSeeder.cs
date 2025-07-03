@@ -4,6 +4,8 @@ using PracticaAPI.Data;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PracticaAPI.Data
 {
@@ -19,19 +21,46 @@ namespace PracticaAPI.Data
 
         public void Seed(int numCategories = 0, int numBudgets = 0, int numExpenses = 0)
         {
+            var userId = EnsureDummyUser();
             if (numBudgets > 0)
-                AddBudgets(numBudgets);
+                AddBudgets(numBudgets, userId);
             if (numCategories > 0)
                 AddCategories(numCategories);
             if (numExpenses > 0)
                 AddExpenses(numExpenses);
         }
 
-        public void AddBudgets(int count)
+        private Guid EnsureDummyUser()
+        {
+            var user = _context.Users.FirstOrDefault();
+            if (user == null)
+            {
+                user = new User
+                {
+                    Username = "dummyuser",
+                    PasswordHash = HashPassword("dummy1234"),
+                    CreatedAt = DateTime.UtcNow,
+                    LastLogin = DateTime.UtcNow,
+                    IsActive = true
+                };
+                _context.Users.Add(user);
+                _context.SaveChanges();
+            }
+            return user.Id;
+        }
+
+        private string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
+        }
+
+        public void AddBudgets(int count, Guid userId)
         {
             var budgetFaker = new Faker<MonthlyBudget>()
                 .RuleFor(b => b.Month, f => f.Date.Between(DateTime.Now.AddYears(-5), DateTime.Now))
-                .RuleFor(b => b.UserId, f => Guid.NewGuid()); // UserId dummy
+                .RuleFor(b => b.UserId, f => userId);
             var budgets = budgetFaker.Generate(count);
             _context.MonthlyBudgets.AddRange(budgets);
             _context.SaveChanges();
