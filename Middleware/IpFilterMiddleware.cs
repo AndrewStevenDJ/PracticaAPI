@@ -23,14 +23,14 @@ public class IpFilterMiddleware
         var path = context.Request.Path.Value?.ToLower();
         _logger.LogInformation($"IP Filter - Path: {path}, Client IP: {clientIp}, Allowed IP: {_allowedIp}");
         
-        // Permitir acceso solo a endpoints de autenticación y test
+        // Permitir acceso libre solo a endpoints de autenticación y test
         if (path != null && (path.StartsWith("/api/auth") || path.StartsWith("/api/test")))
         {
             await _next(context);
             return;
         }
 
-        // Verificar si la IP del cliente está permitida
+        // Permitir acceso a Swagger y a cualquier otro endpoint solo si la IP es la permitida
         if (clientIp != _allowedIp)
         {
             _logger.LogWarning($"IP Filter - BLOQUEADO: La IP del cliente '{clientIp}' no está autorizada. Permitida: '{_allowedIp}'");
