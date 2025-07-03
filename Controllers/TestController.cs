@@ -63,6 +63,31 @@ public class TestController : ControllerBase
         });
     }
 
+    [HttpGet("debug-ip")]
+    public IActionResult DebugIpDetection()
+    {
+        var clientIp = GetClientIpAddress();
+        var allowedIp = Environment.GetEnvironmentVariable("AllowedIP");
+        var allHeaders = GetDetailedIpInfo();
+        return Ok(new
+        {
+            DebugType = "IP Detection Debug",
+            DetectedIP = clientIp,
+            ExpectedIP = allowedIp,
+            IsMatch = clientIp == allowedIp,
+            AllHeaders = Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString()),
+            ConnectionInfo = new
+            {
+                RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                LocalIpAddress = HttpContext.Connection.LocalIpAddress?.ToString(),
+                RemotePort = HttpContext.Connection.RemotePort,
+                LocalPort = HttpContext.Connection.LocalPort
+            },
+            IPDetectionDetails = allHeaders,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
     [HttpGet("auth-test")]
     [Authorize] // Este endpoint requiere autenticación
     public IActionResult TestAuth()

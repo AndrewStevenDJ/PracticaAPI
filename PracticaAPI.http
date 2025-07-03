@@ -19,6 +19,10 @@ GET {{baseUrl}}/api/test/status
 # @name testIpFilter
 GET {{baseUrl}}/api/test/ip-test
 
+### 0.3. Debug detallado de detección de IP
+# @name debugIp
+GET {{baseUrl}}/api/test/debug-ip
+
 ### 1. Registro de usuario
 # @name register
 POST {{baseUrl}}/api/auth/register
