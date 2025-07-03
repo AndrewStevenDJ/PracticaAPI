@@ -6,4 +6,5 @@ public class Expense
     public decimal Amount { get; set; }
     public DateTime Date { get; set; } = DateTime.UtcNow;
     public Guid CategoryId { get; set; }
+    public BudgetCategory Category { get; set; }
 }

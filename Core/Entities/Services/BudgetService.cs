@@ -15,11 +15,12 @@ public class BudgetService : IBudgetService
         _context = context;
     }
 
-    public async Task<MonthlyBudget> CreateBudgetAsync(CreateBudgetDto dto)
+    public async Task<MonthlyBudget> CreateBudgetAsync(CreateBudgetDto dto, Guid userId)
     {
         var budget = new MonthlyBudget
         {
             Month = dto.Month,
+            UserId = userId,
             Categories = dto.Categories
                 .GroupBy(c => c.Name.ToLower()) // Evitar repetidos
                 .Select(g => new BudgetCategory { Name = g.Key, Limit = g.First().Limit })
