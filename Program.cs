@@ -99,8 +99,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Ejecutar el seeder automáticamente en desarrollo
-env = app.Environment;
-if (env.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())
     {
