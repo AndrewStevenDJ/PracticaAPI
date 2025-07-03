@@ -7,7 +7,6 @@ using PracticaAPI.Core.Services;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-// using PracticaAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +27,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "PracticaAPI", Version = "v1" });
-    
+
     // Add JWT authentication to Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -101,4 +100,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+// 🔧 ESTA LÍNEA ES CLAVE PARA RAILWAY:
+app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT")}");
