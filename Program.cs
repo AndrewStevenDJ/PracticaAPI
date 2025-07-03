@@ -6,7 +6,7 @@ using System.Text;
 using PracticaAPI.Core.Services;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
-using PracticaAPI.Middleware;
+// using PracticaAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +15,7 @@ builder.Services.AddControllers();
 
 // Configurar base de datos en memoria (para pruebas)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
-    )
-);
+    options.UseInMemoryDatabase("PracticaAPIDb"));
 
 // Register services
 builder.Services.AddScoped<IBudgetService, BudgetService>();
@@ -94,8 +90,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Aplicar filtro de IP antes de CORS y autenticación
-app.UseIpFilter();
+// app.UseIpFilter(); // Eliminado para permitir acceso desde cualquier IP
 
 app.UseCors("AllowAll");
 

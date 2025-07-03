@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
 
     // POST: api/auth/register
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto registerDto)
+    public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterDto registerDto)
     {
         if (!ModelState.IsValid)
         {
@@ -51,7 +51,7 @@ public class AuthController : ControllerBase
             return BadRequest(result);
         }
 
-        return CreatedAtAction(nameof(Login), result);
+        return Ok(result);
     }
 
     // GET: api/auth/me (para obtener información del usuario actual)

@@ -51,12 +51,12 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
+    public async Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto)
     {
         // Validar que las contraseñas coincidan
         if (registerDto.Password != registerDto.ConfirmPassword)
         {
-            return new AuthResponseDto
+            return new RegisterResponseDto
             {
                 Success = false,
                 Message = "Las contraseñas no coinciden"
@@ -69,7 +69,7 @@ public class AuthService : IAuthService
 
         if (existingUser != null)
         {
-            return new AuthResponseDto
+            return new RegisterResponseDto
             {
                 Success = false,
                 Message = "El usuario ya existe"
@@ -86,14 +86,11 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var token = GenerateJwtToken(user);
-
-        return new AuthResponseDto
+        return new RegisterResponseDto
         {
             Success = true,
-            Token = token,
             Username = user.Username,
-            Message = "Usuario registrado exitosamente"
+            Message = "Usuario creado exitosamente"
         };
     }
 
