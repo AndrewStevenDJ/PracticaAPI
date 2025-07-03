@@ -21,7 +21,6 @@ public class IpFilterMiddleware
     {
         var clientIp = GetClientIpAddress(context);
         var path = context.Request.Path.Value?.ToLower();
-        
         _logger.LogInformation($"IP Filter - Path: {path}, Client IP: {clientIp}, Allowed IP: {_allowedIp}");
         
         // Permitir acceso solo a endpoints de autenticación y test
@@ -32,9 +31,9 @@ public class IpFilterMiddleware
         }
 
         // Verificar si la IP del cliente está permitida
-        if (clientIp != "187.155.101.200")
+        if (clientIp != _allowedIp)
         {
-            _logger.LogWarning($"IP Filter - BLOQUEADO: La IP del cliente '{clientIp}' no está autorizada. Permitida: '187.155.101.200'");
+            _logger.LogWarning($"IP Filter - BLOQUEADO: La IP del cliente '{clientIp}' no está autorizada. Permitida: '{_allowedIp}'");
             context.Response.StatusCode = 403; // Prohibido
             context.Response.ContentType = "application/json";
             var errorResponse = new
@@ -42,7 +41,7 @@ public class IpFilterMiddleware
                 Error = "Acceso denegado",
                 Message = "Su dirección IP no es válida para acceder a esta API.",
                 ClientIP = clientIp,
-                AllowedIP = "187.155.101.200",
+                AllowedIP = _allowedIp,
                 Path = path,
                 Timestamp = DateTime.UtcNow
             };
