@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using PracticaAPI.DTOs;
+using PracticaAPI.Core.Services.Interfaces;
 
 
 [ApiController]
