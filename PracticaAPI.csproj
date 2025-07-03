@@ -14,7 +14,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+<<<<<<< HEAD
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
+=======
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
+>>>>>>> 9a6f8f748adf9a43da6b541ada7f2230be43748b
   </ItemGroup>
 
 </Project>
