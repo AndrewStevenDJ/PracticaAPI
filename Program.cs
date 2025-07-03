@@ -6,6 +6,7 @@ using System.Text;
 using PracticaAPI.Core.Services;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 // using PracticaAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Configurar base de datos en memoria (para pruebas)
+// Configurar base de datos MySQL de Railway
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("PracticaAPIDb"));
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), 
+    ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 
 // Register services
 builder.Services.AddScoped<IBudgetService, BudgetService>();
