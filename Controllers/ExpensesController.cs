@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PracticaAPI.Data;
 using PracticaAPI.Core.Entities;
-using Microsoft.AspNetCore.Authorization;
 
 namespace PracticaAPI.Controllers;
 

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.DTOs;
 
@@ -55,11 +56,11 @@ public class AuthController : ControllerBase
 
     // GET: api/auth/me (para obtener información del usuario actual)
     [HttpGet("me")]
+    [Authorize] // Requiere autenticación
     public ActionResult GetCurrentUser()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
-        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
 
         if (userId == null)
         {
@@ -69,8 +70,7 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             UserId = userId,
-            Username = username,
-            Email = email
+            Username = username
         });
     }
 } 

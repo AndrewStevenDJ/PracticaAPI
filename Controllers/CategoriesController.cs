@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using PracticaAPI.Core.Entities;
 using PracticaAPI.Data;
 using PracticaAPI.DTOs;
-using Microsoft.AspNetCore.Authorization;
 
 namespace PracticaAPI.Controllers;
 

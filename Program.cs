@@ -6,6 +6,7 @@ using System.Text;
 using PracticaAPI.Core.Services;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
+using PracticaAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Aplicar filtro de IP antes de CORS y autenticación
+app.UseIpFilter();
 
 app.UseCors("AllowAll");
 

@@ -120,15 +120,62 @@ git log --oneline
 
 ## 🔧 CONFIGURACIÓN
 
+### Filtro de IP
+- **IP Permitida**: 187.155.101.200
+- **Middleware**: IpFilterMiddleware
+- **Comportamiento**: Solo permite acceso desde la IP especificada
+- **Respuesta para IPs no autorizadas**: HTTP 403 Forbidden
+
 ### Base de Datos
-- **Servidor**: HappyMangas.mssql.somee.com
-- **Base de datos**: HappyMangas
-- **Usuario**: dark1444467_SQLLogin_1
-- **Cadena de conexión**: Configurada en appsettings.json
+- **Tipo**: InMemory Database (para desarrollo)
+- **Nombre**: PracticaAPIDb
 
 ### Swagger UI
 - **URL**: https://localhost:7000/swagger
 - **URL alternativa**: http://localhost:5000/swagger
+
+### Endpoints de Prueba
+- **GET** `/api/test/ip` - Verificar IP del cliente
+- **GET** `/api/test/status` - Estado de la API
+- **GET** `/api/test/auth-test` - Probar autenticación (requiere token)
+
+### 🔐 Autenticación JWT
+
+#### 1. Registro de usuario:
+```bash
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "tu_usuario",
+  "password": "tu_contraseña",
+  "confirmPassword": "tu_contraseña"
+}
+```
+
+#### 2. Login para obtener token:
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "tu_usuario",
+  "password": "tu_contraseña"
+}
+```
+
+#### 3. Usar el token en las peticiones:
+```bash
+GET /api/budgets
+Authorization: Bearer tu_token_aqui
+```
+
+### ⚠️ Notas importantes:
+- **Todos los endpoints CRUD requieren autenticación** (excepto `/api/auth/*` y `/api/test/*`)
+- **Solo la IP `187.155.101.200` puede acceder** a la API
+- **El token expira en 7 días**
+- **Error 401**: Token inválido o faltante
+- **Error 403**: IP no autorizada
 
 ## 📝 EJEMPLOS DE USO
 
