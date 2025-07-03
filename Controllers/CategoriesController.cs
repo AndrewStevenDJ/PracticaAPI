@@ -36,11 +36,16 @@ public class CategoriesController : ControllerBase
         return Ok(new { total, page, pageSize, categories });
     }
 
-    // POST: api/Categories?budgetId=xxx
+    // POST: api/Categories
     [HttpPost]
-    public async Task<IActionResult> CreateCategory([FromQuery] Guid budgetId, [FromBody] BudgetCategoryDto dto)
+    public async Task<IActionResult> CreateCategory([FromBody] BudgetCategoryDto dto)
     {
-        var exists = await _context.BudgetCategories.AnyAsync(c => c.MonthlyBudgetId == budgetId && c.Name.ToLower() == dto.Name.ToLower());
+        // Verificar que el presupuesto existe
+        var budget = await _context.MonthlyBudgets.FindAsync(dto.MonthlyBudgetId);
+        if (budget == null)
+            return BadRequest("El presupuesto especificado no existe.");
+
+        var exists = await _context.BudgetCategories.AnyAsync(c => c.MonthlyBudgetId == dto.MonthlyBudgetId && c.Name.ToLower() == dto.Name.ToLower());
         if (exists)
             return BadRequest("Ya existe una categoría con ese nombre en este presupuesto.");
 
@@ -48,11 +53,11 @@ public class CategoriesController : ControllerBase
         {
             Name = dto.Name,
             Limit = dto.Limit,
-            MonthlyBudgetId = budgetId
+            MonthlyBudgetId = dto.MonthlyBudgetId
         };
         _context.BudgetCategories.Add(category);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetCategories), new { budgetId }, dto);
+        return CreatedAtAction(nameof(GetCategories), new { budgetId = dto.MonthlyBudgetId }, dto);
     }
 
     // PUT: api/Categories/{id}

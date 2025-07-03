@@ -24,14 +24,26 @@ Content-Type: application/json
 ### 3. GUARDAR TOKEN
 @token = {{login.response.body.token}}
 
-### 4. CREAR CATEGORÍA
+### 4. CREAR PRESUPUESTO PRIMERO
+POST {{baseUrl}}/api/budgets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "month": 7,
+  "year": 2024,
+  "totalAmount": 5000.00
+}
+
+### 5. CREAR CATEGORÍA (usar el ID del presupuesto creado)
 POST {{baseUrl}}/api/categories
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "Comida",
-  "description": "Gastos en alimentación"
+  "limit": 1000.00,
+  "monthlyBudgetId": "{{budget_id}}"
 }
 
 ### 5. OBTENER TODAS LAS CATEGORÍAS
