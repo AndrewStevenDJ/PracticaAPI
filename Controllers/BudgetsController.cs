@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
+using PracticaAPI.DTOs;
+using PracticaAPI.Core.Services.Interfaces;
+
+namespace PracticaAPI.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class BudgetsController : ControllerBase

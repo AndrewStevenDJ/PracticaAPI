@@ -1,3 +1,8 @@
+using PracticaAPI.DTOs;
+using PracticaAPI.Core.Entities;
+
+namespace PracticaAPI.Core.Services.Interfaces;
+
 public interface IBudgetService
 {
     Task<MonthlyBudget> CreateBudgetAsync(CreateBudgetDto dto);

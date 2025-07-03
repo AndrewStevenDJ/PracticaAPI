@@ -1,3 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using PracticaAPI.Core.Entities;
+
+namespace PracticaAPI.Data;
+
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {}

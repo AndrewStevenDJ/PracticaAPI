@@ -1,3 +1,5 @@
+namespace PracticaAPI.Core.Entities;
+
 public class MonthlyBudget
 {
     public Guid Id { get; set; } = Guid.NewGuid();

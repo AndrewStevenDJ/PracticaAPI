@@ -1,3 +1,5 @@
+namespace PracticaAPI.DTOs;
+
 public class CreateExpenseDto
 {
     public Guid CategoryId { get; set; }

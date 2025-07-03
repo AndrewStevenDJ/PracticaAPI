@@ -1,3 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using PracticaAPI.Core.Entities;
+using PracticaAPI.Core.Services.Interfaces;
+using PracticaAPI.Data;
+using PracticaAPI.DTOs;
+
+namespace PracticaAPI.Core.Services;
+
 public class BudgetService : IBudgetService
 {
     private readonly AppDbContext _context;

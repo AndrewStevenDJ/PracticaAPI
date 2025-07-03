@@ -1,3 +1,5 @@
+namespace PracticaAPI.DTOs;
+
 public class CreateBudgetDto
 {
     public DateTime Month { get; set; }
