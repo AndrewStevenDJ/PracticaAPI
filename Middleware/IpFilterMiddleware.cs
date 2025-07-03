@@ -28,7 +28,18 @@ public class IpFilterMiddleware
         if (clientIp != _allowedIp)
         {
             context.Response.StatusCode = 403; // Forbidden
-            await context.Response.WriteAsync("Access denied. Your IP is not authorized.");
+            context.Response.ContentType = "application/json";
+            
+            var errorResponse = new
+            {
+                Error = "Access Denied",
+                Message = "Your IP address is not authorized to access this API.",
+                ClientIP = clientIp,
+                AllowedIP = _allowedIp,
+                Timestamp = DateTime.UtcNow
+            };
+            
+            await context.Response.WriteAsJsonAsync(errorResponse);
             return;
         }
 
@@ -37,19 +48,41 @@ public class IpFilterMiddleware
 
     private string GetClientIpAddress(HttpContext context)
     {
-        // Obtener la IP real del cliente, considerando proxies
+        // Obtener la IP real del cliente, considerando proxies y load balancers
         var forwardedHeader = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
         if (!string.IsNullOrEmpty(forwardedHeader))
         {
-            return forwardedHeader.Split(',')[0].Trim();
+            // Tomar la primera IP de la lista (IP original del cliente)
+            var ips = forwardedHeader.Split(',');
+            return ips[0].Trim();
         }
 
         var realIpHeader = context.Request.Headers["X-Real-IP"].FirstOrDefault();
         if (!string.IsNullOrEmpty(realIpHeader))
         {
-            return realIpHeader;
+            return realIpHeader.Trim();
         }
 
-        return context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var xForwardedProtoHeader = context.Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(xForwardedProtoHeader))
+        {
+            // Si hay X-Forwarded-Proto, también verificar X-Forwarded-For
+            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(forwardedFor))
+            {
+                return forwardedFor.Split(',')[0].Trim();
+            }
+        }
+
+        // Obtener la IP directa de la conexión
+        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+        
+        // Si es IPv6, convertir a IPv4 si es posible
+        if (remoteIp != null && remoteIp.Contains("::ffff:"))
+        {
+            remoteIp = remoteIp.Replace("::ffff:", "");
+        }
+
+        return remoteIp ?? "Unknown";
     }
 } 

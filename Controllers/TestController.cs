@@ -12,6 +12,7 @@ public class TestController : ControllerBase
     public IActionResult GetStatus()
     {
         var clientIp = GetClientIpAddress();
+        var allHeaders = GetDetailedIpInfo();
         
         return Ok(new
         {
@@ -19,6 +20,7 @@ public class TestController : ControllerBase
             ClientIP = clientIp,
             IsAllowed = clientIp == "187.155.101.200",
             AllowedIP = "187.155.101.200",
+            IPDetectionDetails = allHeaders,
             Timestamp = DateTime.UtcNow
         });
     }
@@ -27,14 +29,37 @@ public class TestController : ControllerBase
     public IActionResult GetClientIp()
     {
         var clientIp = GetClientIpAddress();
+        var allHeaders = GetDetailedIpInfo();
         
         return Ok(new
         {
             ClientIP = clientIp,
             IsAllowed = clientIp == "187.155.101.200",
+            AllowedIP = "187.155.101.200",
             Message = clientIp == "187.155.101.200" 
                 ? "Your IP is authorized" 
-                : "Your IP is not authorized"
+                : "Your IP is not authorized",
+            IPDetectionDetails = allHeaders,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    [HttpGet("ip-test")]
+    public IActionResult TestIpFilter()
+    {
+        var clientIp = GetClientIpAddress();
+        var allHeaders = GetDetailedIpInfo();
+        
+        return Ok(new
+        {
+            TestType = "IP Filter Test",
+            ClientIP = clientIp,
+            IsAllowed = clientIp == "187.155.101.200",
+            AllowedIP = "187.155.101.200",
+            Status = clientIp == "187.155.101.200" ? "AUTHORIZED" : "BLOCKED",
+            IPDetectionDetails = allHeaders,
+            Note = "This endpoint tests the IP filter. Only 187.155.101.200 is allowed.",
+            Timestamp = DateTime.UtcNow
         });
     }
 
@@ -56,19 +81,55 @@ public class TestController : ControllerBase
 
     private string GetClientIpAddress()
     {
-        // Obtener la IP real del cliente, considerando proxies
+        // Obtener la IP real del cliente, considerando proxies y load balancers
         var forwardedHeader = Request.Headers["X-Forwarded-For"].FirstOrDefault();
         if (!string.IsNullOrEmpty(forwardedHeader))
         {
-            return forwardedHeader.Split(',')[0].Trim();
+            // Tomar la primera IP de la lista (IP original del cliente)
+            var ips = forwardedHeader.Split(',');
+            return ips[0].Trim();
         }
 
         var realIpHeader = Request.Headers["X-Real-IP"].FirstOrDefault();
         if (!string.IsNullOrEmpty(realIpHeader))
         {
-            return realIpHeader;
+            return realIpHeader.Trim();
         }
 
-        return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var xForwardedProtoHeader = Request.Headers["X-Forwarded-Proto"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(xForwardedProtoHeader))
+        {
+            // Si hay X-Forwarded-Proto, también verificar X-Forwarded-For
+            var forwardedFor = Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(forwardedFor))
+            {
+                return forwardedFor.Split(',')[0].Trim();
+            }
+        }
+
+        // Obtener la IP directa de la conexión
+        var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        
+        // Si es IPv6, convertir a IPv4 si es posible
+        if (remoteIp != null && remoteIp.Contains("::ffff:"))
+        {
+            remoteIp = remoteIp.Replace("::ffff:", "");
+        }
+
+        return remoteIp ?? "Unknown";
+    }
+
+    private object GetDetailedIpInfo()
+    {
+        return new
+        {
+            XForwardedFor = Request.Headers["X-Forwarded-For"].FirstOrDefault(),
+            XRealIP = Request.Headers["X-Real-IP"].FirstOrDefault(),
+            XForwardedProto = Request.Headers["X-Forwarded-Proto"].FirstOrDefault(),
+            XForwardedHost = Request.Headers["X-Forwarded-Host"].FirstOrDefault(),
+            RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+            LocalIpAddress = HttpContext.Connection.LocalIpAddress?.ToString(),
+            UserAgent = Request.Headers["User-Agent"].FirstOrDefault()
+        };
     }
 } 

@@ -15,6 +15,10 @@ GET {{baseUrl}}/api/test/ip
 # @name testStatus
 GET {{baseUrl}}/api/test/status
 
+### 0.2. Probar filtro de IP específicamente
+# @name testIpFilter
+GET {{baseUrl}}/api/test/ip-test
+
 ### 1. Registro de usuario
 # @name register
 POST {{baseUrl}}/api/auth/register
@@ -196,5 +200,10 @@ Authorization: Bearer {{token}}
 # ⚠️ IMPORTANTE: Esta API solo permite acceso desde la IP 187.155.101.200
 # Si estás probando desde otra IP, recibirás error 403 Forbidden
 # Los endpoints /api/auth/* y /api/test/* están exentos del filtro de IP
+# 
+# Para probar el filtro:
+# 1. Desde la IP autorizada (187.155.101.200): Todos los endpoints funcionan
+# 2. Desde otra IP: Solo /api/auth/* y /api/test/* son accesibles
+# 3. Los endpoints CRUD requieren tanto IP autorizada como token válido
 
 ###

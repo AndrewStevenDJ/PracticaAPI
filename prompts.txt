@@ -137,6 +137,7 @@ git log --oneline
 ### Endpoints de Prueba
 - **GET** `/api/test/status` - Estado de la API con información de IP
 - **GET** `/api/test/ip` - Verificar IP del cliente
+- **GET** `/api/test/ip-test` - Probar filtro de IP específicamente
 - **GET** `/api/test/auth-test` - Probar autenticación (requiere token)
 
 ### 🔐 Autenticación JWT
