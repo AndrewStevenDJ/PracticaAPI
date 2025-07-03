@@ -7,6 +7,7 @@ using PracticaAPI.Core.Services;
 using PracticaAPI.Core.Services.Interfaces;
 using PracticaAPI.Data;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register services
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<DataSeeder>();
 
 // Swagger (OpenAPI) para documentación
 builder.Services.AddEndpointsApiExplorer();
@@ -95,6 +97,17 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Ejecutar el seeder automáticamente en desarrollo
+env = app.Environment;
+if (env.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var seeder = new DataSeeder(scope.ServiceProvider.GetRequiredService<AppDbContext>());
+        seeder.Seed();
+    }
+}
 
 // Línea para que Railway escuche el puerto asignado dinámicamente
 app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT")}");
