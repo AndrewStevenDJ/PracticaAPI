@@ -85,17 +85,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Swagger habilitado SIEMPRE (producción y desarrollo)
+app.UseCors("AllowAll");
+
+// Agregar middleware de filtro de IP
+app.UseMiddleware<IpFilterMiddleware>();
+
+// Swagger habilitado SIEMPRE (producción y desarrollo), pero ahora protegido por el filtro de IP
 app.UseSwagger();
 app.UseSwaggerUI();
 
 // Deshabilita temporalmente redirección HTTPS para evitar problemas en Railway
 // app.UseHttpsRedirection();
-
-app.UseCors("AllowAll");
-
-// Agregar middleware de filtro de IP
-app.UseMiddleware<IpFilterMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
