@@ -82,17 +82,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger habilitado SIEMPRE (producción y desarrollo)
+app.UseSwagger();
+app.UseSwaggerUI();
 
+// Deshabilita temporalmente redirección HTTPS para evitar problemas en Railway
 // app.UseHttpsRedirection();
-
-
-// app.UseIpFilter(); // Eliminado para permitir acceso desde cualquier IP
 
 app.UseCors("AllowAll");
 
@@ -101,5 +96,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// 🔧 ESTA LÍNEA ES CLAVE PARA RAILWAY:
+// Línea para que Railway escuche el puerto asignado dinámicamente
 app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT")}");
