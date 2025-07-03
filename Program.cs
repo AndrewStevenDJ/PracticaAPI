@@ -15,7 +15,11 @@ builder.Services.AddControllers();
 
 // Configurar base de datos en memoria (para pruebas)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("PracticaAPIDb"));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
 
 // Register services
 builder.Services.AddScoped<IBudgetService, BudgetService>();
