@@ -63,16 +63,28 @@ public class CategoriesController : ControllerBase
 
     // POST: api/Categories
     [HttpPost]
-    public async Task<IActionResult> CreateCategory([FromBody] BudgetCategoryDto dto)
+    public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto dto)
     {
-        // Verificar que el presupuesto existe
-        var budget = await _context.MonthlyBudgets.FindAsync(dto.MonthlyBudgetId);
+        var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+        
+        // Verificar que el presupuesto existe y pertenece al usuario
+        var budget = await _context.MonthlyBudgets
+            .Where(b => b.Id == dto.MonthlyBudgetId && b.UserId == userId)
+            .FirstOrDefaultAsync();
+            
         if (budget == null)
-            return BadRequest("El presupuesto especificado no existe.");
+            return BadRequest("El presupuesto especificado no existe o no tienes permisos para acceder a él.");
 
-        var exists = await _context.BudgetCategories.AnyAsync(c => c.MonthlyBudgetId == dto.MonthlyBudgetId && c.Name.ToLower() == dto.Name.ToLower());
+        // Verificar que no existe una categoría con el mismo nombre en este presupuesto
+        var exists = await _context.BudgetCategories
+            .AnyAsync(c => c.MonthlyBudgetId == dto.MonthlyBudgetId && c.Name.ToLower() == dto.Name.ToLower());
+            
         if (exists)
             return BadRequest("Ya existe una categoría con ese nombre en este presupuesto.");
+
+        // Validar que el límite sea positivo
+        if (dto.Limit <= 0)
+            return BadRequest("El límite de la categoría debe ser mayor a 0.");
 
         var category = new BudgetCategory
         {
@@ -80,9 +92,69 @@ public class CategoriesController : ControllerBase
             Limit = dto.Limit,
             MonthlyBudgetId = dto.MonthlyBudgetId
         };
+        
         _context.BudgetCategories.Add(category);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetCategories), new { budgetId = dto.MonthlyBudgetId }, dto);
+        
+        // Retornar la categoría creada con información completa
+        var categoryDto = new BudgetCategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Limit = category.Limit,
+            MonthlyBudgetId = category.MonthlyBudgetId,
+            TotalSpent = 0 // Nueva categoría, sin gastos
+        };
+        
+        return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, categoryDto);
+    }
+
+    // POST: api/Categories/comida
+    [HttpPost("comida")]
+    public async Task<IActionResult> CreateComidaCategory([FromBody] CreateComidaCategoryDto dto)
+    {
+        var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
+        
+        // Verificar que el presupuesto existe y pertenece al usuario
+        var budget = await _context.MonthlyBudgets
+            .Where(b => b.Id == dto.MonthlyBudgetId && b.UserId == userId)
+            .FirstOrDefaultAsync();
+            
+        if (budget == null)
+            return BadRequest("El presupuesto especificado no existe o no tienes permisos para acceder a él.");
+
+        // Verificar que no existe una categoría "Comida" en este presupuesto
+        var exists = await _context.BudgetCategories
+            .AnyAsync(c => c.MonthlyBudgetId == dto.MonthlyBudgetId && c.Name.ToLower() == "comida");
+            
+        if (exists)
+            return BadRequest("Ya existe una categoría 'Comida' en este presupuesto.");
+
+        // Validar que el límite sea positivo
+        if (dto.Limit <= 0)
+            return BadRequest("El límite de la categoría debe ser mayor a 0.");
+
+        var category = new BudgetCategory
+        {
+            Name = "Comida",
+            Limit = dto.Limit,
+            MonthlyBudgetId = dto.MonthlyBudgetId
+        };
+        
+        _context.BudgetCategories.Add(category);
+        await _context.SaveChangesAsync();
+        
+        // Retornar la categoría creada con información completa
+        var categoryDto = new BudgetCategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Limit = category.Limit,
+            MonthlyBudgetId = category.MonthlyBudgetId,
+            TotalSpent = 0
+        };
+        
+        return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, categoryDto);
     }
 
     // PUT: api/Categories/{id}
